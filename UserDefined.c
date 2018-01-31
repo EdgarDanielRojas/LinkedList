@@ -35,6 +35,8 @@
 
 #include <glib.h>
 #include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include "UserDefined.h"
 
 /**
@@ -55,7 +57,7 @@
  */
 int PrintItem (const void *data_p){
 	node_p data = data_p;
-	printf("%d %s\n", data->theNumber,data->theString);
+	printf("%d %s\n", data->number,data->theString);
 	return EXIT_SUCCESS;
 }
 
@@ -110,7 +112,7 @@ int PrintList (GList * myList_p){
  */
 node_p NewItem (int theNumber, char * theString){
 	node_p node = (node_p)malloc(sizeof(struct myData));
-	node->theNumber = theNumber;
+	node->number = theNumber;
 	node->theString = *theString;
 	return node;
 }
@@ -159,6 +161,7 @@ int FreeItem (const void *data_p){
  *
  */
 int DestroyList (GList * theList_p){
+	GList * l;
 	for(l=theList_p;l!=NULL;l=l->next){
     node_p node = l->data;
     FreeItem(node);
@@ -193,9 +196,9 @@ int DestroyList (GList * theList_p){
  */
 int CompareItems (const void *item1_p, const void *item2_p){
 	node_p node1 = item1_p,node2=item2_p;
-	if(node1->theNumber < node2->theNumber)
+	if(node1->number < node2->number)
 		return LESS;
-	else if(node1->theNumber > node2->theNumber)
+	else if(node1->number > node2->number)
 		return GREATER;
 	else
 		return EQUAL;
@@ -254,7 +257,7 @@ int CompareItemsWithKey (const void *item1_p, const void *item2_p, int key){
 		break;
 		case SINGLEINT:
 			int * integer = item2_p;
-			if(node1->theNumber==*integer)
+			if(node1->number==*integer)
 				return EQUAL;
 			else
 				return NOTEQUAL;
@@ -290,7 +293,7 @@ int CompareItemsWithKey (const void *item1_p, const void *item2_p, int key){
 void * CopyItems (const void *source_p){
 	node_p nodeOriginal = source_p;
 	node_p nodeCopy = (node_p)malloc(sizeof(struct myData));
-	nodeCopy->theNumber = nodeOriginal->theNumber;
+	nodeCopy->number = nodeOriginal->number;
 	nodeCopy->theString = nodeOriginal->theString;
 	return nodeCopy;
 }
@@ -316,7 +319,16 @@ void * CopyItems (const void *source_p){
  * @note   The user must check if the returned pointer is NULL
  *         before de-referencing it.
  */
-GList * CopyList (GList * inputList);
+GList * CopyList (GList * inputList){
+	GList * theCopy = NULL,l;
+	node_p aNode_p=NULL;
+	for(l=inputList;l!=NULL;l=l->next){
+    node_p node = l->data;
+    aNode_p = NewItem(node->number, node->theString);
+    theCopy = g_list_append(theCopy, aNode_p);
+  	}
+  	return theCopy;
+}
 
 /**
  *
