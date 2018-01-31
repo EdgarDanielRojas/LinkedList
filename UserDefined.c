@@ -1,13 +1,13 @@
 /**
- * @copyright (c) 2016 Abelardo López Lagunas
+ * @copyright (c) 2018 Edgar Daniel Rojas Vazquez
  *
- * @file    UserDefined.h
+ * @file    UserDefined.c
  *
- * @author  Abelardo López Lagunas
+ * @author  Edgar Daniel Rojas Vazquez
  *
- * @date    Fri 20 May 2016 22:09 DST
+ * @date    Wed 31 Jan 2018 11:27 DST
  *
- * @brief   Declares all the user defined functions for handling the
+ * @brief   Implements all the user defined functions for handling the
  *          specific user-defined data structure that is pointed to
  *          by the doubly linked list node in Glib.
  *
@@ -15,12 +15,8 @@
  *          Code loosely based on my Generic Singly linked list algorithm.
  *
  * Revision history:
- *          Fri 06 Feb 2015 14:02 CST -- File created
- *          Thu 05 May 2016 10:45 DST -- Changed to use Glib functions
- *          Mon 09 May 2016 17:07 DST -- Added newItem function
- *          Tue 10 May 2016 12:07 DST -- Added CompareItems function to
- *                          implement sort using g_list_sort()
- *          Fri 20 May 2016 22:09 DST -- Changed DoxyGen comments
+ *          Wed 31 Jan 2018 11:27 CST -- File created and finished
+ *          
  *
  * @warning If there is not enough memory to create a node or a list
  *          the related functions indicate failure. If the DEBUG compiler
@@ -56,9 +52,12 @@
  *
  */
 int PrintItem (const void *data_p){
-	node_p data = data_p;
-	printf("%d %s\n", data->number,data->theString);
-	return EXIT_SUCCESS;
+	if(data_p!=NULL){ // Check if the pointer is NULL
+	node_p data = data_p; // We cast the generic void * pointer to a node_p pointer
+	printf("%d %s\n", data->number,data->theString); //We print the information in the node, printing the number first and then the string
+	return EXIT_SUCCESS; //We return that the printing of the node was succesfull.
+	}
+	return EXIT_FAILURE; // We return exit failure if the pointer is empty
 }
 
 /**
@@ -83,11 +82,16 @@ int PrintItem (const void *data_p){
  *
  */
 int PrintList (GList * myList_p){
-	GList * l=NULL;
-	for(l=myList_p;l!=NULL;l=l->next){
-	PrintItem(l->data);
+	if(myList_p!=NULL){ // We check the list pointer to see if it is NULL
+		GList * l=NULL; // We declare a temporary variable so that we can cycle through the list
+		for(l=myList_p;l!=NULL;l=l->next){ // We cycle through the list so that we can print each node
+		if(PrintItem(l->data) == EXIT_FAILURE)
+			return EXIT_FAILURE; 	// The data from each node (node_p) is passed to printitem so that it can handle
+									// display of the information. In case of failure this funcion also fails.
+	  	}
+	  	return EXIT_SUCCESS; // We exit succesfully
   	}
-  	return EXIT_SUCCESS;
+  	return EXIT_FAILURE; //In case of a null list we return exit failure.
 }
 
 /**
@@ -112,10 +116,10 @@ int PrintList (GList * myList_p){
  *
  */
 node_p NewItem (int theNumber, char * theString){
-	node_p node = (node_p)malloc(sizeof(struct myData_));
-	node->number = theNumber;
-	node->theString = theString;
-	return node;
+	node_p node = (node_p)malloc(sizeof(struct myData_)); // We create a new space in memory for our myData structure and assign it to a pointer
+	node->number = theNumber; // We assign the number that is passed as a parameter to the structure
+	node->theString = theString; // We assign the string that is passed as a paramter to the structure
+	return node; // We return the pointer to the structure
 }
 
 /**
@@ -138,8 +142,11 @@ node_p NewItem (int theNumber, char * theString){
  *          user-defined structure.
  */
 int FreeItem (const void *data_p){
-	free(data_p);
-	return EXIT_SUCCESS;
+	if(data_p!=NULL){ // data_p is checked to see if it is NULL
+	free(data_p); // The memory is freed from the structure using the built in free() function
+	return EXIT_SUCCESS; // We exit succesfully
+	}
+	return EXIT_FAILURE; // In case of a NULL pointer we exit failure
 }
 
 /**
@@ -162,12 +169,17 @@ int FreeItem (const void *data_p){
  *
  */
 int DestroyList (GList * theList_p){
-	GList * l;
-	for(l=theList_p;l!=NULL;l=l->next){
-    node_p node = l->data;
-    FreeItem(node);
-  	}
-  	return EXIT_SUCCESS;
+	if(theList_p!=NULL){
+		GList * l = NULL;  // We create a temporary pointer so that we can cycle through the list
+		for(l=theList_p;l!=NULL;l=l->next){ // The for loop cycles through every member of our GList
+	    node_p node = l->data; // We extract the data from the node (a node_p) and assign it to a pointer of type myData
+	    if(FreeItem(node) == EXIT_FAILURE) // We pass the pointer to FreeItem so that the memory can be liberated 
+	    		return EXIT_FAILURE;
+	    								 
+	  	}
+	  	return EXIT_SUCCESS; // We return success if everything is succesfull
+	}
+	return EXIT_FAILURE; // In case the list is NULL we return a failure
 }
 
 /**
@@ -196,13 +208,13 @@ int DestroyList (GList * theList_p){
  *
  */
 int CompareItems (const void *item1_p, const void *item2_p){
-	node_p node1 = item1_p,node2=item2_p;
-	if(node1->number < node2->number)
-		return LESS;
-	else if(node1->number > node2->number)
-		return GREATER;
+	node_p node1 = item1_p,node2=item2_p; // We convert our generic void pointers to node_p pointers so that we can manage the structure
+	if(node1->number < node2->number) // We compare the numbers of the nodes to see if node 1 is less
+		return LESS; // We return the enum value LESS 
+	else if(node1->number > node2->number) // We compare the numbers of the nodes to see if node 1 is more
+		return GREATER; // We return the enum value GREATER if the condicion is met
 	else
-		return EQUAL;
+		return EQUAL; // The final option is that they are equal
 }
 
 /**
@@ -238,34 +250,34 @@ int CompareItems (const void *item1_p, const void *item2_p){
  *
  */
 int CompareItemsWithKey (const void *item1_p, const void *item2_p, int key){
-	node_p node1=item1_p,node2 = item2_p;
-	int *integer = NULL;
+	node_p node1=item1_p,node2 = item2_p; // We assume our parameters passed are going to be node_p pointers.
+	int *integer = NULL; //We declare an integer pointer and a char pointer in case the above statement is not true
 	char *string = NULL;
-	switch(key){
-		case INT:
-			return CompareItems(item1_p,item2_p);
+	switch(key){ // A switch statement lets us handle each key type individually
+		case INT: // INT key case
+			return CompareItems(item1_p,item2_p); //In case we just want to compare the number, we call our default compare function
 		break;
-		case STR:
-			if(strcmp(node1->theString,node2->theString)==0)
+		case STR: //STR key case
+			if(strcmp(node1->theString,node2->theString)==0) // We compare both nodes' strings to see if they are equal
 				return EQUAL;
 			else
-				return NOTEQUAL;
+				return NOTEQUAL; // In case that they are not equal we return the enum NOTEQUAL
 		break;
-		case SINGLESTR:
-			string = item2_p;
-			if(strcmp(node1->theString,string)==0)
+		case SINGLESTR: //SINGLESTR case
+			string = item2_p; // We assign our second generic pointer to the char pointer created earlier
+			if(strcmp(node1->theString,string)==0) // We compare the strings as in the previous case to see if they are equal.
 				return EQUAL;
 			else
-				return NOTEQUAL;
+				return NOTEQUAL; // In case that they are not equal we return the enum NOTEQUAL
 		break;
-		case SINGLEINT:
-			integer = item2_p;
-			if(node1->number==*integer)
+		case SINGLEINT: //SINGLEINT case
+			integer = item2_p; // We assign our second generic pointer to the int pointer created earlier
+			if(node1->number==*integer) //We compare the number in our node with the value stored in the address of the pointer
 				return EQUAL;
 			else
-				return NOTEQUAL;
+				return NOTEQUAL; // In case that they are not equal we return the enum NOTEQUAL
 		default:
-			return NOTEQUAL;
+			return NOTEQUAL; // If no valid key is entered a default NOTEQUAL is returned
 	}
 }
 
@@ -294,11 +306,14 @@ int CompareItemsWithKey (const void *item1_p, const void *item2_p, int key){
  *          The caller is responsible for de-allocating the new item.
  */
 void * CopyItems (const void *source_p){
-	node_p nodeOriginal = source_p;
-	node_p nodeCopy = (node_p)malloc(sizeof(struct myData_));
-	nodeCopy->number = nodeOriginal->number;
-	nodeCopy->theString = nodeOriginal->theString;
-	return nodeCopy;
+	if(source_p!=NULL){
+	node_p nodeOriginal = source_p; // We cast our source node to a node_p pointer type for easy handling
+	node_p nodeCopy = (node_p)malloc(sizeof(struct myData_)); // We allocate space for our new node that we will copy the data into
+	nodeCopy->number = nodeOriginal->number; // We copy the number from original node into the new node
+	nodeCopy->theString = nodeOriginal->theString; // We copy the string from the original node into the new node
+	return nodeCopy; // We return the pointer to the new node
+	}
+	return NULL; // If the source pointer is null we return null
 }
 
 /**
@@ -323,15 +338,17 @@ void * CopyItems (const void *source_p){
  *         before de-referencing it.
  */
 GList * CopyList (GList * inputList){
-	GList *theCopy = NULL;
-	GList *l;
-	node_p aNode_p=NULL;
-	for(l=inputList;l!=NULL;l=l->next){
-    node_p node = l->data;
-    aNode_p = NewItem(node->number, node->theString);
-    theCopy = g_list_append(theCopy, aNode_p);
+	GList *theCopy = NULL; // We create an empty GList pointer that will be the starting point for our copy 
+	if(inputList!=NULL){
+	GList *l; // A temporary pointer is created that will allow us to cycle through our list
+	node_p aNode_p=NULL; // A temporary node is created that will let us append new nodes to the list
+	for(l=inputList;l!=NULL;l=l->next){ // We cycle through the list
+    node_p node = l->data; // We extract the data from the current node (a node_p pointer) and assign it to a variable
+    aNode_p = NewItem(node->number, node->theString); // We create a new memory location for the copy of the node, copying the same data from the node that comes from the original list
+    theCopy = g_list_append(theCopy, aNode_p); // The new node created is appended to the copy of the list
   	}
-  	return theCopy;
+  	}
+  	return theCopy; // We return the pointer to the copy of the list, in case the input is NULL the pointer will also be NULL
 }
 
 /**
@@ -362,21 +379,12 @@ GList * CopyList (GList * inputList){
  *
  */
 GList * FindInList (GList * myList_p, const void *value_p, int key){
-	GList *l;
-	node_p node;
-	if(key==SINGLESTR){
-		for(l=myList_p;l!=NULL;l=l->next){
-	    	node = l->data;
-	    	if(CompareItemsWithKey(node,value_p,key) == 0)
-	    		return l;
-  		}
-	}
-	if(key==SINGLEINT){
-		for(l=myList_p;l!=NULL;l=l->next){
-	    	node = l->data;
-	    	if(CompareItemsWithKey(node,value_p,key) == 0)
-	    		return l;
-  		}
-	}
-	return NULL;
+	GList *l = NULL; // We create a temporary pointer so that we can cycle through the list
+	node_p node = NULL; // We create a variable that will store the pointer to the data in each GList type
+	for(l=myList_p;l!=NULL;l=l->next){ // We cycle through the list
+    	node = l->data; // The data is extracted and stored in the node variable
+    	if(CompareItemsWithKey(node,value_p,key) == 0) // We compare the value needed in the node depending oon what type of key the user passes. If the function returns zero we have found
+    		return l;									// our node
+		}
+	return NULL; // In case the node isn't found we return null
 }
