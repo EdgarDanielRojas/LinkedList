@@ -83,6 +83,7 @@ int PrintItem (const void *data_p){
  *
  */
 int PrintList (GList * myList_p){
+	GList * l=NULL;
 	for(l=myList_p;l!=NULL;l=l->next){
 	PrintItem(l->data);
   	}
@@ -111,9 +112,9 @@ int PrintList (GList * myList_p){
  *
  */
 node_p NewItem (int theNumber, char * theString){
-	node_p node = (node_p)malloc(sizeof(struct myData));
+	node_p node = (node_p)malloc(sizeof(struct myData_));
 	node->number = theNumber;
-	node->theString = *theString;
+	node->theString = theString;
 	return node;
 }
 
@@ -238,6 +239,8 @@ int CompareItems (const void *item1_p, const void *item2_p){
  */
 int CompareItemsWithKey (const void *item1_p, const void *item2_p, int key){
 	node_p node1=item1_p,node2 = item2_p;
+	int *integer = NULL;
+	char *string = NULL;
 	switch(key){
 		case INT:
 			return CompareItems(item1_p,item2_p);
@@ -249,14 +252,14 @@ int CompareItemsWithKey (const void *item1_p, const void *item2_p, int key){
 				return NOTEQUAL;
 		break;
 		case SINGLESTR:
-			char * string = item2_p;
+			string = item2_p;
 			if(strcmp(node1->theString,string)==0)
 				return EQUAL;
 			else
 				return NOTEQUAL;
 		break;
 		case SINGLEINT:
-			int * integer = item2_p;
+			integer = item2_p;
 			if(node1->number==*integer)
 				return EQUAL;
 			else
@@ -292,7 +295,7 @@ int CompareItemsWithKey (const void *item1_p, const void *item2_p, int key){
  */
 void * CopyItems (const void *source_p){
 	node_p nodeOriginal = source_p;
-	node_p nodeCopy = (node_p)malloc(sizeof(struct myData));
+	node_p nodeCopy = (node_p)malloc(sizeof(struct myData_));
 	nodeCopy->number = nodeOriginal->number;
 	nodeCopy->theString = nodeOriginal->theString;
 	return nodeCopy;
@@ -320,7 +323,8 @@ void * CopyItems (const void *source_p){
  *         before de-referencing it.
  */
 GList * CopyList (GList * inputList){
-	GList * theCopy = NULL,l;
+	GList *theCopy = NULL;
+	GList *l;
 	node_p aNode_p=NULL;
 	for(l=inputList;l!=NULL;l=l->next){
     node_p node = l->data;
@@ -357,4 +361,22 @@ GList * CopyList (GList * inputList){
  *         before de-referencing it.
  *
  */
-GList * FindInList (GList * myList_p, const void *value_p, int key);
+GList * FindInList (GList * myList_p, const void *value_p, int key){
+	GList *l;
+	node_p node;
+	if(key==SINGLESTR){
+		for(l=myList_p;l!=NULL;l=l->next){
+	    	node = l->data;
+	    	if(CompareItemsWithKey(node,value_p,key) == 0)
+	    		return l;
+  		}
+	}
+	if(key==SINGLEINT){
+		for(l=myList_p;l!=NULL;l=l->next){
+	    	node = l->data;
+	    	if(CompareItemsWithKey(node,value_p,key) == 0)
+	    		return l;
+  		}
+	}
+	return NULL;
+}
