@@ -53,8 +53,8 @@
  */
 int PrintItem (const void *data_p){
 	if(data_p!=NULL){ // Check if the pointer is NULL
-	node_p data = data_p; // We cast the generic void * pointer to a node_p pointer
-	printf("%d %s\n", data->number,data->theString); //We print the information in the node, printing the number first and then the string
+	//const node_p data = data_p; // We cast the generic void * pointer to a node_p pointer
+	printf("%d %s\n", ((node_p)data_p)->number,((node_p)data_p)->theString); //We print the information in the node, printing the number first and then the string
 	return EXIT_SUCCESS; //We return that the printing of the node was succesfull.
 	}
 	return EXIT_FAILURE; // We return exit failure if the pointer is empty
@@ -143,7 +143,7 @@ node_p NewItem (int theNumber, char * theString){
  */
 int FreeItem (const void *data_p){
 	if(data_p!=NULL){ // data_p is checked to see if it is NULL
-	free(data_p); // The memory is freed from the structure using the built in free() function
+	free((void *)data_p); // The memory is freed from the structure using the built in free() function
 	return EXIT_SUCCESS; // We exit succesfully
 	}
 	return EXIT_FAILURE; // In case of a NULL pointer we exit failure
@@ -208,10 +208,10 @@ int DestroyList (GList * theList_p){
  *
  */
 int CompareItems (const void *item1_p, const void *item2_p){
-	node_p node1 = item1_p,node2=item2_p; // We convert our generic void pointers to node_p pointers so that we can manage the structure
-	if(node1->number < node2->number) // We compare the numbers of the nodes to see if node 1 is less
+	//node_p node1 = item1_p,node2=item2_p; // We convert our generic void pointers to node_p pointers so that we can manage the structure
+	if(((node_p)item1_p)->number < ((node_p)item2_p)->number) // We compare the numbers of the nodes to see if node 1 is less
 		return LESS; // We return the enum value LESS 
-	else if(node1->number > node2->number) // We compare the numbers of the nodes to see if node 1 is more
+	else if(((node_p)item1_p)->number > ((node_p)item2_p)->number) // We compare the numbers of the nodes to see if node 1 is more
 		return GREATER; // We return the enum value GREATER if the condicion is met
 	else
 		return EQUAL; // The final option is that they are equal
@@ -250,29 +250,29 @@ int CompareItems (const void *item1_p, const void *item2_p){
  *
  */
 int CompareItemsWithKey (const void *item1_p, const void *item2_p, int key){
-	node_p node1=item1_p,node2 = item2_p; // We assume our parameters passed are going to be node_p pointers.
-	int *integer = NULL; //We declare an integer pointer and a char pointer in case the above statement is not true
-	char *string = NULL;
+	//node_p node1=item1_p,node2 = item2_p; // We assume our parameters passed are going to be node_p pointers.
+	//int *integer = NULL; //We declare an integer pointer and a char pointer in case the above statement is not true
+	//char *string = NULL;
 	switch(key){ // A switch statement lets us handle each key type individually
 		case INT: // INT key case
 			return CompareItems(item1_p,item2_p); //In case we just want to compare the number, we call our default compare function
 		break;
 		case STR: //STR key case
-			if(strcmp(node1->theString,node2->theString)==0) // We compare both nodes' strings to see if they are equal
+			if(strcmp(((node_p)item1_p)->theString,((node_p)item2_p)->theString)==0) // We compare both nodes' strings to see if they are equal
 				return EQUAL;
 			else
 				return NOTEQUAL; // In case that they are not equal we return the enum NOTEQUAL
 		break;
 		case SINGLESTR: //SINGLESTR case
-			string = item2_p; // We assign our second generic pointer to the char pointer created earlier
-			if(strcmp(node1->theString,string)==0) // We compare the strings as in the previous case to see if they are equal.
+			//string = item2_p; // We assign our second generic pointer to the char pointer created earlier
+			if(strcmp(((node_p)item1_p)->theString,((char *)item2_p))==0) // We compare the strings as in the previous case to see if they are equal.
 				return EQUAL;
 			else
 				return NOTEQUAL; // In case that they are not equal we return the enum NOTEQUAL
 		break;
 		case SINGLEINT: //SINGLEINT case
-			integer = item2_p; // We assign our second generic pointer to the int pointer created earlier
-			if(node1->number==*integer) //We compare the number in our node with the value stored in the address of the pointer
+			//integer = item2_p; // We assign our second generic pointer to the int pointer created earlier
+			if(((node_p)item1_p)->number==*((int *)item2_p)) //We compare the number in our node with the value stored in the address of the pointer
 				return EQUAL;
 			else
 				return NOTEQUAL; // In case that they are not equal we return the enum NOTEQUAL
@@ -307,10 +307,10 @@ int CompareItemsWithKey (const void *item1_p, const void *item2_p, int key){
  */
 void * CopyItems (const void *source_p){
 	if(source_p!=NULL){
-	node_p nodeOriginal = source_p; // We cast our source node to a node_p pointer type for easy handling
+	//node_p nodeOriginal = source_p; // We cast our source node to a node_p pointer type for easy handling
 	node_p nodeCopy = (node_p)malloc(sizeof(struct myData_)); // We allocate space for our new node that we will copy the data into
-	nodeCopy->number = nodeOriginal->number; // We copy the number from original node into the new node
-	nodeCopy->theString = nodeOriginal->theString; // We copy the string from the original node into the new node
+	nodeCopy->number = ((node_p)source_p)->number; // We copy the number from original node into the new node
+	nodeCopy->theString = ((node_p)source_p)->theString; // We copy the string from the original node into the new node
 	return nodeCopy; // We return the pointer to the new node
 	}
 	return NULL; // If the source pointer is null we return null
