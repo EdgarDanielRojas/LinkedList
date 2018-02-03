@@ -26,10 +26,11 @@ gcc -D DEBUG *.c \`pkg-config --cflags --libs glib-2.0\` -o LinkedList
 gcc *.c \`pkg-config --cflags --libs glib-2.0\` -o LinkedList
 ## MAC OSX compilation
 ### Debugging mode on
-gcc -D DEBUG *.c -o LinkedList (pkg-config -- cflags -- libs glib-2.0)
+gcc -D DEBUG *.c -o LinkedList \`pkg-config -- cflags -- libs glib-2.0\`
 ### No debugging mode on
-gcc *.c -o LinkedList (pkg-config -- cflags -- libs glib-2.0)
+gcc *.c -o LinkedList \`pkg-config -- cflags -- libs glib-2.0\`
 
 # Running the program
 The program expects a text file (two are included in this repository) with the format of # Text
+
 LinkedList nodes.txt
