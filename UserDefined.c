@@ -118,7 +118,7 @@ int PrintList (GList * myList_p){
 node_p NewItem (int theNumber, char * theString){
 	node_p node = (node_p)malloc(sizeof(struct myData_)); // We create a new space in memory for our myData structure and assign it to a pointer
 	node->number = theNumber; // We assign the number that is passed as a parameter to the structure
-	node->theString = theString; // We assign the string that is passed as a paramter to the structure
+	node->theString = strdup(theString); // We assign the string that is passed as a paramter to the structure
 	return node; // We return the pointer to the structure
 }
 
@@ -310,7 +310,7 @@ void * CopyItems (const void *source_p){
 	//node_p nodeOriginal = source_p; // We cast our source node to a node_p pointer type for easy handling
 	node_p nodeCopy = (node_p)malloc(sizeof(struct myData_)); // We allocate space for our new node that we will copy the data into
 	nodeCopy->number = ((node_p)source_p)->number; // We copy the number from original node into the new node
-	nodeCopy->theString = ((node_p)source_p)->theString; // We copy the string from the original node into the new node
+	nodeCopy->theString = strdup(((node_p)source_p)->theString); // We copy the string from the original node into the new node
 	return nodeCopy; // We return the pointer to the new node
 	}
 	return NULL; // If the source pointer is null we return null
